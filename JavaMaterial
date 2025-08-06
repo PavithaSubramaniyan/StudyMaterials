@@ -1,0 +1,148 @@
+1. What’s the difference between JDK, JRE, and JVM?
+
+⦁	   JVM (Java Virtual Machine): Runs Java bytecode.
+⦁	   JRE (Java Runtime Environment): JVM + libraries for running Java programs.
+⦁	   JDK (Java Development Kit): JRE + development tools (compiler, debugger).
+
+2. Why is Java considered platform-independent?
+
+⦁	   Java code is compiled into **bytecode**, which runs on any JVM regardless of the OS.
+
+3. Difference between an abstract class and an interface?
+
+   | Feature      | Abstract Class              | Interface                                        |
+   | ------------ | --------------------------- | ------------------------------------------------ |
+   | Inheritance  | Single inheritance          | Multiple inheritance                             |
+   | Method types | Concrete + abstract methods | Only abstract (Java 7), default/static (Java 8+) |
+   | Keyword      | `abstract`                  | `interface`                                      |
+
+4. What’s the role of final, finally, and finalize in Java?
+
+⦁	   final: Prevents inheritance/modification.
+⦁	   finally: Used in exception handling to run cleanup code.
+⦁	   finalize(): Called by garbage collector before object is destroyed (deprecated in recent Java versions).
+
+ 1. final → Can't Change
+Use: Prevents modification (of variables, methods, or classes).
+
+Variable	Value can’t be changed after initialization.
+Method	Can’t be overridden in subclass.
+Class	Can’t be inherited (subclassed).
+
+ Example:
+final int age = 25; // can't reassign age
+
+final class Animal { } // can't extend this class
+
+class Dog extends Animal { } // ERROR!
+
+class Parent {
+    final void show() {
+        System.out.println("Hello");
+    }
+}
+
+class Child extends Parent {
+    void show() {} //  ERROR!
+}
+
+“Final = Fixed (can’t be changed)”
+
+2. finally → Always Executes
+Use: A block that always runs after try-catch, even if there's an exception or return.
+
+ Example:
+try {
+    int a = 5 / 0;
+} catch (Exception e) {
+    System.out.println("Error");
+} finally {
+    System.out.println("This will always run!");
+}
+Memory Tip:
+“Finally = I’ll run no matter what!”
+ 3. finalize() → Cleanup Before Destruction (Deprecated in newer Java versions)
+Use: Called by the garbage collector before deleting the object to clean up resources.
+ Example:
+class MyClass {
+    protected void finalize() {
+        System.out.println("Object is being garbage collected");
+    }
+}
+ Memory Tip:
+“Finalize = Last call before object dies (like a will)”
+
+5. Stack vs. Heap memory: What’s the difference?
+
+⦁	   Stack: Stores method calls and local variables.
+⦁	   Heap: Stores objects and class instances.
+
+ example:
+public class Main {
+    public static void main(String[] args) {
+        int a = 10;
+        Car c = new Car(); // Object creation
+    }
+}
+
+class Car {
+    int speed = 100;
+}
+
+
+ Memory Breakdown:
+ int a = 10;
+ is a primitive
+
+Stored entirely in the Stack
+ Car c = new Car();
+c is a reference variable → stored in Stack
+
+new Car() creates a Car object → stored in Heap
+
+The speed inside Car (value 100) is also in Heap, because it belongs to the object.
+
+So, Summary:
+Element Memory Location
+a = 10	Stack
+c (reference)	Stack
+new Car() (object)	Heap
+speed = 100 inside Car	Heap
+
+Key Rule to Remember:
+⦁	Primitives and references → go to Stack
+⦁	Objects created with new → go to Heap
+
+| Feature           | Stack Memory                        | Heap Memory                       |
+| ----------------- | ----------------------------------- | --------------------------------- |
+| **Used For**      | Method calls, local variables       | Objects and instance variables    |
+| **Memory Size**   | Small                               | Large                             |
+| **Access Speed**  | Faster                              | Slower                            |
+| **Lifetime**      | Until method ends                   | Until object is garbage collected |
+| **Managed By**    | Java automatically                  | Java Garbage Collector            |
+| **Thread Safety** | Yes (each thread has its own stack) | No (shared across threads)        |
+
+
+6. Method overloading vs. method overriding?
+
+⦁	   Overloading: Same method name, different parameters (compile-time).
+⦁	   Overriding: Subclass redefines superclass method (runtime).
+
+7. Difference between private and protected access modifiers?
+
+⦁	   private: Accessible only within the class.
+⦁	   protected: Accessible within the package and subclasses.
+
+8. What’s constructor overloading in Java?
+
+⦁	   Defining multiple constructors in a class with different parameter lists.
+
+9. Purpose of the super keyword in Java?
+
+   Refers to the parent class and is used to:
+⦁	     Access parent class methods/variables.
+⦁	     Call parent class constructor.
+
+10. What’s the purpose of static blocks in Java?
+
+     Used to initialize static variables and run one-time code when class is loaded.
