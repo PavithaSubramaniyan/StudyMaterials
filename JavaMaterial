@@ -146,3 +146,489 @@ Key Rule to Remember:
 10. What’s the purpose of static blocks in Java?
 
      Used to initialize static variables and run one-time code when class is loaded.
+
+11. What are wrapper classes in Java?
+
+⦁	Wrapper classes convert primitive types (int, char, etc.) into objects (Integer, Character, etc.).
+⦁	Useful for working with collections and generics (like ArrayList) .
+
+Primitive	Wrapper Class
+⦁	int    	Integer
+⦁	char	        Character
+⦁	boolean	Boolean
+⦁	byte  	Byte
+⦁	short	Short
+⦁	long	        Long
+float	Float
+⦁	double	Double
+
+int num = 10;
+ Boxing (primitive ➝ object)
+ Integer obj = num;
+
+// Unboxing (object ➝ primitive)
+int x = obj;
+
+ Why is Integer an object but int is not?
+🔹 1. int is a primitive type
+⦁	It's not an object
+
+⦁	Stores only the value, like 5, 10, etc.
+
+⦁	No methods, no null, no OOP features
+
+int a = 5; // just stores value 5
+
+🔹 2. Integer is a class (i.e., an object type)
+⦁	It's the wrapper for int
+
+⦁	You can use it like an object:
+
+⦁	Pass it to functions
+
+⦁	Store in collections
+
+⦁	Use methods like .compareTo(), .toString(), etc.
+
+Integer b = 5; // Object form of int
+System.out.println(b.toString()); // prints "5"
+
+
+12. Difference between throw and throws?
+
+Keyword	                   Purpose 	                    Used In	                Example
+throw	  Actually throws an exception object	        Inside method	        throw new ArithmeticException();
+throws	  Declares that method might throw exception	In method signature	void myMethod() throws IOException 
+
+
+⦁	Creates and throws an exception immediately.
+⦁	Only one exception object can be thrown at a time.
+ Use throw when you want to manually create and throw an exception.
+
+ For example:
+
+⦁	You want to stop the program if a condition is wrong.
+
+⦁	You want to give a custom error.
+
+public class Test {
+    public static void main(String[] args) {
+        throw new ArithmeticException("Divide by zero");
+    }
+}
+public void check() {
+    int a = 10 / 0; // throws ArithmeticException automatically
+}
+This throws an unchecked exception, so no need to write throw or throws.
+
+Method           	Used When...
+throw new Exception()	You want to stop immediately due to a rule violation
+if-else          	You want to handle it softly and show a message
+
+
+🔹 throws – Used to declare that a method may throw exceptions
+
+Use throws when you call a method that might throw a checked exception — but you don’t want to handle it right now.
+when 
+The file doesn’t exist?
+⦁	
+⦁	You don’t have permission?
+
+public void readFile() throws IOException {
+    FileReader file = new FileReader("test.txt");
+}
+This means: ❗"I won’t handle the problem now — someone else should."
+public void readFile() {
+    FileReader file = new FileReader("abc.txt"); // ❌ Compile error
+}
+
+Result: Compile-time error!
+Because checked exceptions (like IOException) must be declared or handled.
+
+Lets the caller know they must handle the exception.
+
+Can declare multiple exceptions, like throws IOException, SQLException  public void readFile() throws IOException , SQLException{
+
+readFile() is a helper function.
+a library for math operations
+
+Use Case	                    Use throws?	            Example
+Utility/helper method	      ✅ Yes	   File reading, DB connection
+Library function	             ✅ Yes	   Division, encryption, parsing
+UI / App-specific code	      ❌ No	   Use try-catch directly
+Business logic in activity    ❌ No	           Show Toast, alert, fallback
+
+
+13. What is a try-catch block used for?
+
+⦁	To handle exceptions and prevent program crashes.
+
+Syntax:
+try {
+    // code that may throw exception
+} catch (Exception e) {
+    // handle exception
+}
+
+
+14. Difference between checked and unchecked exceptions?
+| Type              | Description                           | Example                                   |
+|-------------------|---------------------------------------|------------------------                   |
+| Checked Exception | Must be handled (compile-time)        | IOException, SQLException                 |
+| Unchecked         | Occurs at runtime, not checked        | NullPointerException, ArithmeticException |
+
+
+
+15. What is multithreading in Java?
+
+⦁	Ability to run multiple tasks (threads) concurrently to improve performance.
+The ability of Java to execute two or more parts of a program at the same time, by running them in separate threads.
+⦁	Thread → a lightweight unit of execution.
+Multithreading → many threads running concurrently.
+
+
+class DownloadTask extends Thread {
+    public void run() {
+        for (int i = 1; i <= 5; i++) {
+            System.out.println("Downloading... " + i + "%");
+            try { Thread.sleep(500); } catch (InterruptedException e) {}
+        }
+    }
+}
+
+class MusicTask extends Thread {
+    public void run() {
+        for (int i = 1; i <= 5; i++) {
+            System.out.println("Playing song... beat " + i);
+            try { Thread.sleep(500); } catch (InterruptedException e) {}
+        }
+    }
+}
+
+public class MultiThreadDemo {
+    public static void main(String[] args) {
+        DownloadTask download = new DownloadTask();
+        MusicTask music = new MusicTask();
+
+        download.start(); // Start download thread
+        music.start();    // Start music thread
+    }
+}
+
+Android example
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var mediaPlayer: MediaPlayer
+    private val mainScope = MainScope() // For launching coroutines in this Activity
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // 🎵 Start playing music (UI Thread)
+        mediaPlayer = MediaPlayer.create(this, R.raw.song)
+        mediaPlayer.start()
+
+        // ⬇ Start downloading file in background
+        mainScope.launch(Dispatchers.IO) {
+            downloadFile("https://example.com/song.mp3")
+
+            // ✅ Update UI after download
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@MainActivity, "Download complete!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+16. What is synchronization in Java?
+
+⦁	Ensures that only one thread accesses a resource at a time to prevent data inconsistency.
+Without synchronized → Multiple people writing in a notebook at the same time → messy data.
+⦁	With synchronized → Only one person writes at a time → clean, correct data.
+
+You have an Android chat app that:
+⦁	Has two background threads:
+⦁	One receives new messages from the server
+⦁	One saves them to a local database
+⦁	Both threads update the same ArrayList<Message> in memory
+
+ Where This Is Useful in Android - chat aps , musixc apps, download manager, gams
+⦁	Updating shared data structures from multiple threads
+
+⦁	e.g., an in-memory cache, a list of download tasks
+
+⦁	Reading & writing to files or databases in background threads
+
+⦁	Working with LiveData/MutableState where multiple threads push updates
+
+⦁	Custom background workers in games, music apps, or real-time messaging
+
+class ChatStorage {
+    val messages = ArrayList<String>()
+
+    @Synchronized
+    fun addMessage(msg: String) {
+        messages.add(msg) // Thread-safe now
+    }
+}
+
+class MainActivity : AppCompatActivity() {
+    private val storage = ChatStorage()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        Thread {
+            repeat(1000) { storage.addMessage("From Thread 1: $it") }
+        }.start()
+
+        Thread {
+            repeat(1000) { storage.addMessage("From Thread 2: $it") }
+        }.start()
+    }
+}
+
+
+17. Difference between process and thread?
+
+| Aspect   | Process           | Thread                      |
+|----------|-------------------|-----------------------------|
+| Memory   | Own memory space  | Shares memory with process  |
+| Overhead | Heavy             | Light                       |
+| Execution| Independent       | Concurrent within a process |
+
+Deep Understanding — When to Use What
+| You want to…                                                | Use **Process**                       | Use **Thread** |
+| ----------------------------------------------------------- | -----------------------------------   | -------------- |
+| Fully isolate tasks (crash in one shouldn’t kill the other) | ✅                                   | ❌              |
+| Run multiple things **inside the same app** and share data  | ❌                                   | ✅              |
+| Save memory                                                 | ❌ (each process has its own memory) | ✅              |
+| Avoid UI freeze in Android                                  | ❌ (not needed)                      | ✅              |
+| Run separate apps / system services                         | ✅                                   | ❌              |
+
+
+18. What are daemon threads?
+
+Background threads that stop when the main thread ends (e.g., garbage collector).
+Stops automatically when all non-daemon (user) threads finish.
+
+If the main thread (the app's main worker) ends, daemon threads vanish automatically — they don’t keep the program alive.
+
+
+Why useful?
+For background services that shouldn’t prevent the app from exiting:
+
+⦁	Garbage Collector
+
+⦁	Auto-saving
+
+⦁	Heartbeat pings
+
+⦁	Log writing
+
+ Lock it in your head
+⦁	Daemon = Helper
+
+⦁	Stops with main
+
+⦁	No daemon → app stays alive until thread ends
+
+⦁	Yes daemon → app exits even if thread is still running
+
+**A daemon thread is a helper thread that stops when the main thread ends, while a non-daemon thread keeps the app alive until it finishes.**
+In Android, you don’t directly set daemon threads most of the time — because the Android framework manages background threads for you using things like:
+
+HandlerThread
+
+Executors
+
+WorkManager
+
+AsyncTask (deprecated but still seen in older apps)
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val thread = Thread {
+            while (true) {
+                Log.d("DaemonThread", "Uploading logs...")
+                Thread.sleep(1000)
+            }
+        }
+
+        thread.isDaemon = true // same as Java setDaemon(true)
+        thread.start()
+
+        Log.d("Main", "UI thread done with setup")
+    }
+}
+
+What happens here?
+
+⦁	The UI thread (main) sets up the app.
+
+⦁	The daemon thread keeps uploading logs.
+
+⦁	If you close the activity and the main thread ends, the daemon thread also stops automatically.
+
+Where you’d use daemon-like behavior in Android
+
+⦁	Log uploading in the background (non-essential work)
+
+⦁	Cache cleanup while the app is running
+
+⦁	Heartbeat pings to a server
+
+⦁	Preloading images in memory
+
+These are helper tasks — if the user leaves the app, we don’t care if they stop.
+
+19. What is a deadlock?
+
+A situation where two or more threads are waiting for each other forever, blocking progress.
+
+⦁	Person A has a spoon but needs a fork to eat.
+
+⦁	Person B has a fork but needs a spoon to eat.
+
+⦁	Both refuse to let go of what they have until they get the other utensil.
+⦁	→ Result: Both wait forever, no one eats. 
+
+You have multiple shared resources (files, database locks, network sockets).
+
+⦁	Different threads acquire them in different orders.
+
+⦁	Example:
+
+⦁	Thread 1 locks Resource A → waits for Resource B.
+
+Thread 2 locks Resource B → waits for Resource A.
+
+Demo deadlock
+
+public class MainActivity extends AppCompatActivity {
+
+    private final Object mediaPlayerLock = new Object();
+    private final Object networkLock = new Object();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Thread threadA = new Thread(() -> {
+            synchronized (mediaPlayerLock) {
+                Log.d("DEADLOCK", "Thread A: Locked MediaPlayer");
+
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+
+                synchronized (networkLock) {
+                    Log.d("DEADLOCK", "Thread A: Locked Network");
+                }
+            }
+        });
+
+        Thread threadB = new Thread(() -> {
+            synchronized (networkLock) {
+                Log.d("DEADLOCK", "Thread B: Locked Network");
+
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+
+                synchronized (mediaPlayerLock) {
+                    Log.d("DEADLOCK", "Thread B: Locked MediaPlayer");
+                }
+            }
+        });
+
+        threadA.start();
+        threadB.start();
+    }
+}
+
+fixed version
+
+public class MainActivity extends AppCompatActivity {
+
+    private final Object mediaPlayerLock = new Object();
+    private final Object networkLock = new Object();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Thread threadA = new Thread(() -> {
+            synchronized (mediaPlayerLock) {
+                Log.d("FIXED", "Thread A: Locked MediaPlayer");
+
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+
+                synchronized (networkLock) {
+                    Log.d("FIXED", "Thread A: Locked Network");
+                }
+            }
+        });
+
+        Thread threadB = new Thread(() -> {
+            synchronized (mediaPlayerLock) { // 🔹 Lock order matches Thread A
+                Log.d("FIXED", "Thread B: Locked MediaPlayer");
+
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+
+                synchronized (networkLock) {
+                    Log.d("FIXED", "Thread B: Locked Network");
+                }
+            }
+        });
+
+        threadA.start();
+        threadB.start();
+    }
+}
+
+without lambda 
+Thread threadA = new Thread(new Runnable() {
+    @Override
+    public void run() {
+}}
+with lambda
+Thread threadA = new Thread(() -> {
+    // code
+});
+
+20. What is the purpose of the transient keyword?
+
+Used to skip a field during serialization.
+“🚫 Don’t save this field when you serialize the object.”
+
+Why this is important in Android:
+
+Security: API keys, passwords, session tokens aren’t stored in plain files.
+
+Performance: Skip heavy non-serializable objects (e.g., Bitmaps, MediaPlayers).
+
+💡 Why use transient here?
+
+You don’t need to save Context (you can get it again from the Android framework).
+
+Prevents crashes when serializing non-serializable objects.
+
+Keeps saved files smaller by excluding unnecessary data.
+
+
+import java.io.Serializable;
+import android.content.Context;
+
+public class MyData implements Serializable {
+    String name;
+    transient Context context; // ✅ Ignored during serialization
+
+    public MyData(String name, Context context) {
+        this.name = name;
+        this.context = context;
+    }
+}
+Now, when serializing, context is skipped — so no NotSerializableException.
+
+
+If you try to save this object with ObjectOutputStream, the app crashes because Context cannot be serialized.
+
+
