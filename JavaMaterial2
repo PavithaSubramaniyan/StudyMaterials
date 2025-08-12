@@ -1,0 +1,88 @@
+21. What is serialization in Java?
+
+⦁	It’s the process of converting an object into a byte stream so it can be saved to a file or sent over a network.
+
+⦁	Use ObjectOutputStream and mark class as implements Serializable.
+
+⦁	Serialization = Turning an object into bytes so it can travel or be stored.
+⦁	Memory Hook
+Serialization in Java = Packing an object into a suitcase so you can
+
+Save it to a file
+
+Send it over a network
+
+Later, you unpack the suitcase (deserialization) to get the same object back.
+
+Java steps
+  Mark the class as implements Serializable → “This object can be packed.”
+
+⦁	Use ObjectOutputStream → “Put the object into a suitcase (byte stream).”
+
+⦁	Send / Save → “Ship or store the suitcase.”
+
+⦁	Use ObjectInputStream → “Unpack and get the object back.”
+
+1️⃣ API Calls (Retrofit, Gson/Moshi)
+
+data class User(val name: String, val email: String)
+
+interface ApiService {
+    @POST("users")
+    suspend fun createUser(@Body user: User): Response<User>
+}
+
+// Retrofit will automatically serialize `user` into JSON
+val newUser = User("Alice", "alice@example.com")
+api.createUser(newUser) // Sent as {"name":"Alice","email":"alice@example.com"}
+
+
+2️⃣ Room Database
+
+@Entity
+data class User(
+    @PrimaryKey val id: Int,
+    val name: String,
+    val email: String
+)
+
+// Room stores as primitive/strings — it serializes automatically
+
+3️⃣ SharedPreferences
+
+val user = User("Bob", "bob@example.com")
+val json = Gson().toJson(user) // Serialize to JSON
+
+prefs.edit().putString("user_data", json).apply()
+
+// Later: Deserialize JSON back to object
+val storedJson = prefs.getString("user_data", null)
+val restoredUser = Gson().fromJson(storedJson, User::class.java)
+
+4️⃣ File Storage
+
+data class User(val name: String, val age: Int) : Serializable
+
+val user = User("Charlie", 30)
+ObjectOutputStream(openFileOutput("user.dat", MODE_PRIVATE)).use {
+    it.writeObject(user) // Serialize to file
+}
+
+// Read it back
+val loadedUser = ObjectInputStream(openFileInput("user.dat")).use {
+    it.readObject() as User
+}
+
+5️⃣ Passing Data Between Activities
+
+data class User(val name: String, val age: Int) : Serializable
+
+// In FirstActivity
+val intent = Intent(this, SecondActivity::class.java)
+intent.putExtra("user_data", User("Dave", 40))
+startActivity(intent)
+
+// In SecondActivity
+val user = intent.getSerializableExtra("user_data") as User
+
+
